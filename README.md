@@ -3,7 +3,7 @@
 A java port of https://github.com/ValveSoftware/ArtifactDeckCode
 
 + [ok] Deck Decoding 
-- [not yet] Deck Encoding
++ [ok] Deck Encoding
 + [ok] Card Set API Client with local cache
 
 # notes:
@@ -11,4 +11,4 @@ A java port of https://github.com/ValveSoftware/ArtifactDeckCode
 
 Why valve use PHP? (perverts?) I guess it's ported from C because the function interfaces are so likely to C, without OOP.
 
-
+maybe more tools will be added later.
