@@ -2,7 +2,6 @@ package neoe.artifact;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.StringReader;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class CardSets {
 	}
 
 	static String[] sets = { "00", "01" };
-	Map m;
+	static Map m;
 
 	public Map getCardMap() throws Exception {
 		if (m != null)

@@ -9,7 +9,7 @@ import neoe.util.Base64;
 public class DeckEncoder {
 
 	public static void main(String[] args) throws Exception {
-		System.out.println(EncodedPrefix + EncodeDeck("test1", new int[][] { { 10213, 3, }, { 10212, 1 } },
+		System.out.println(encodeDeck("test1", new int[][] { { 10213, 3, }, { 10212, 1 } },
 				new int[][] { { 10540, 3, }, { 10210, 2 }, { 10211, 1 } }));
 
 	}
@@ -18,9 +18,9 @@ public class DeckEncoder {
 	private static String EncodedPrefix = "ADC";
 	private static int HeaderSize = 3;
 
-	public static String EncodeDeck(String name, int[][] heroes, int[][] cards) throws Exception {
+	public static String encodeDeck(String name, int[][] heroes, int[][] cards) throws Exception {
 		byte[] bs = EncodeBytes(name, heroes, cards);
-		return EncodeBytesToString(bs);
+		return EncodedPrefix + EncodeBytesToString(bs);
 	}
 
 	private static byte[] EncodeBytes(String name, int[][] heroes, int[][] cards) throws Exception {
