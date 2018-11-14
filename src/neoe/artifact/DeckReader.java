@@ -28,7 +28,7 @@ public class DeckReader {
 		List cards = new ArrayList();
 		for (int i = 0; i < lines.length; i++) {
 			String line = lines[i].trim();
-			if (line.length() == 0)
+			if (line.length() == 0 || line.startsWith("#"))
 				continue;
 			if ("Heroes:".equals(line)) {
 				cat = 0;
@@ -87,7 +87,8 @@ public class DeckReader {
 		for (Object o : cm.values()) {
 			Map c = (Map) o;
 			int cat = getCat(c);
-			if (cat==-1)continue;
+			if (cat == -1)
+				continue;
 			String name = Config.gets(c, "card_name.english");
 			int id = Config.toInt(c.get("card_id"));
 			if (nameMap[cat].containsKey(name)) {
@@ -96,15 +97,19 @@ public class DeckReader {
 				nameMap[cat].put(name, id);
 			}
 		}
-		System.out.printf("namemap(%d,%d,%d)\n",nameMap[0].size(),nameMap[1].size(),nameMap[2].size());
+		System.out.printf("namemap(%d,%d,%d)\n", nameMap[0].size(), nameMap[1].size(), nameMap[2].size());
 	}
 
 	private int getCat(Map c) {
 		String type = (String) c.get("card_type");
-		if(Etc.isEmpty(type))Etc.BEM("no card_type:"+c);
-		if ("Ability".equals(type))return -1;
-		if ("Hero".equals(type))return 0;
-		if ("Item".equals(type))return 2;
+		if (Etc.isEmpty(type))
+			Etc.BEM("no card_type:" + c);
+		if ("Ability".equals(type))
+			return -1;
+		if ("Hero".equals(type))
+			return 0;
+		if ("Item".equals(type))
+			return 2;
 		return 1;
 	}
 

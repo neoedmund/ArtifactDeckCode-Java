@@ -1,3 +1,5 @@
+# use neoe.artifact.DeckReader to transform this text into https://playartifact.com/d/ADCJWkFZX05uwGDCRV4XQGy3QGLmqUBg4GQJgGLGgO7AaABZGVjazE_
+
 Heroes:
 1 Lycan
 1 Rix
