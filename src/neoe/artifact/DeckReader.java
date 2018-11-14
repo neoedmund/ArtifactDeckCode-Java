@@ -104,7 +104,7 @@ public class DeckReader {
 		String type = (String) c.get("card_type");
 		if (Etc.isEmpty(type))
 			Etc.BEM("no card_type:" + c);
-		if ("Ability".equals(type))
+		if ("Ability".equals(type) || Config.get(c, "mini_image.default") == null)
 			return -1;
 		if ("Hero".equals(type))
 			return 0;
