@@ -8,16 +8,17 @@ import neoe.util.Base64;
 import neoe.util.Config;
 import neoe.util.Etc;
 
+/** this shows how to decoder the deck hash. Could use by further programs. */
 public class DeckDecoder {
 
 	public static void main(String[] args) throws Exception {
-
 		new DeckDecoder()
 				.run(args.length == 0 ? "ADCJWkTZX05uwGDCRV4XQGy3QGLmqUBg4GQJgGLGgO7AaABR3JlZW4vQmxhY2sgRXhhbXBsZQ__"
 						: args[0]);
 	}
 
 	public void run(String code) throws Exception {
+		System.out.println(code);
 		String prefix = "ADC";
 		if (!code.startsWith(prefix)) {
 			Etc.BEM("should start with " + prefix);
@@ -28,27 +29,27 @@ public class DeckDecoder {
 
 	int CurrentVersion = 2;
 
-	public void parseDeck(byte[] bs) throws Exception {
+	public Object[] parseDeck(byte[] bs) throws Exception {
 		int i = 0;
 		int cnt = bs.length;
-		int verAndHeroes = bs[i++];
+		byte verAndHeroes = bs[i++];
 		int ver = verAndHeroes >> 4;
 		if (CurrentVersion != ver && ver != 1) {
 			Etc.BEM("version not supported:" + ver);
 		}
-		int checksum = bs[i++];
+		byte checksum = bs[i++];
 		int strLen = 0;
 		if (ver > 1) {
 			strLen = bs[i++];
 		}
 		int cardLen = cnt - strLen;
 
-		int csum = 0;
+		byte csum = 0;
 		for (int j = i; j < cardLen; j++) {
 			csum += bs[j];
 		}
-		if (checksum != (csum & 0xff)) {
-			Etc.BEM("checksum not correct.");
+		if (checksum != csum) {
+			Etc.BEM(String.format("checksum not correct. %x!=%x", checksum, csum));
 		}
 		int[] numHeroes = { 0 };
 		{
@@ -58,7 +59,7 @@ public class DeckDecoder {
 			}
 			i = ii[0];
 		}
-
+//		System.out.println("heroes:" + numHeroes[0] + ",strlen=" + strLen);
 		List heroes = new ArrayList();
 		int[] prevCardBase = { 0 };
 		for (int currHero = 0; currHero < numHeroes[0]; currHero++) {
@@ -74,7 +75,8 @@ public class DeckDecoder {
 		}
 		List cards = new ArrayList();
 		prevCardBase[0] = 0;
-		while (i <= cardLen) {
+		int ccnt = 0;
+		while (i < cardLen) {
 			int[] cardCnt = { 0 };
 			int[] cardId = { 0 };
 			int[] ii = { i };
@@ -84,12 +86,15 @@ public class DeckDecoder {
 			i = ii[0];
 			cards.add(new Object[] { cardCnt[0], cardId[0] });
 			System.out.printf("card=%s, count=%d\n", getCardName(cardId[0]), cardCnt[0]);
+			ccnt += cardCnt[0];
 		}
+		System.out.println("cards(not included cards on heroes):" + ccnt);
 		String name = "";
 		if (i <= cnt) {
 			name = new String(bs, bs.length - strLen, strLen, "UTF-8");
 		}
 		System.out.println("name:" + name);
+		return new Object[] { name, heroes, cards };
 	}
 
 	Map m;
@@ -108,12 +113,12 @@ public class DeckDecoder {
 		int header = bs[start[0]++] & 0xff;
 		boolean hasExtCnt = (header >> 6) == 3;
 		int[] delta = { 0 };
-		if (!ReadVarEncodedUint32(header, 5, bs, start, end, delta)) {
+		if (!ReadVarEncodedUint32((byte) header, 5, bs, start, end, delta)) {
 			return false;
 		}
 		outCardID[0] = prev[0] + delta[0];
 		if (hasExtCnt) {
-			if (!ReadVarEncodedUint32(0, 0, bs, start, end, outCnt)) {
+			if (!ReadVarEncodedUint32((byte) 0, 0, bs, start, end, outCnt)) {
 				return false;
 			}
 		} else {
@@ -123,17 +128,16 @@ public class DeckDecoder {
 		return true;
 	}
 
-	private boolean ReadVarEncodedUint32(int baseValue, int baseBits, byte[] bs, int[] start, int end, int[] out) {
+	private boolean ReadVarEncodedUint32(byte baseValue, int baseBits, byte[] bs, int[] start, int end, int[] out) {
 		out[0] = 0;
 		int delta = 0;
 		if ((baseBits == 0) || ReadBitsChunk(baseValue, baseBits, delta, out)) {
 			delta += baseBits;
 			while (true) {
 				if (start[0] > end) {
-					Etc.BEM("ReadVarEncodedUint32 fail");// FIXME
 					return false;
 				}
-				int next = bs[start[0]++];
+				byte next = bs[start[0]++];
 				if (!ReadBitsChunk(next, 7, delta, out))
 					break;
 				delta += 7;
@@ -146,7 +150,7 @@ public class DeckDecoder {
 		int contBit = 1 << numBits;
 		int newBit = chunk & (contBit - 1);
 		outBit[0] |= (newBit << currShift);
-		return ((chunk & contBit) != 0);
+		return (chunk & contBit) != 0;
 	}
 
 }
